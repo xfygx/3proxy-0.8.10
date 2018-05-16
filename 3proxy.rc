@@ -1,0 +1,30 @@
+#include "src/version.h"
+
+
+1 VERSIONINFO
+FILEVERSION 0,1,00,0
+PRODUCTVERSION 0,1,00,0
+FILETYPE 1
+FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "Comments", "prochst - tiny server, http://www.enduc.com/\0"
+            VALUE "CompanyName", "ENDUC\0"
+            VALUE "FileDescription", "prochst - tiny server\0"
+            VALUE "FileVersion", "0.1.00\0"
+            VALUE "InternalName", "prochst\0"
+            VALUE "LegalCopyright", "Copyright (C) 2017-2018 ENDUC\0"
+            VALUE "OriginalFilename", "prochst.exe\0"
+            VALUE "ProductName", "prochst\0"
+            VALUE "ProductVersion", "0.1.00\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0, 1200
+    END
+END
+0 ICON    DISCARDABLE     "ringtones.ico"

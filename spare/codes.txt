@@ -1,0 +1,294 @@
+
+const char* proxyCert = "-----BEGIN CERTIFICATE-----\n\
+MIIDKjCCAhICCQCRhOk1HLonjzANBgkqhkiG9w0BAQsFADBXMQswCQYDVQQGEwJJ\n\
+TjELMAkGA1UECAwCTE4xCzAJBgNVBAcMAkxOMQ4wDAYDVQQKDAVlbmR1YzEOMAwG\n\
+A1UECwwFZW5kdWMxDjAMBgNVBAMMBWVuZHVjMB4XDTE3MTAyODA1MDAzOFoXDTIw\n\
+MDcyNDA1MDAzOFowVzELMAkGA1UEBhMCSU4xCzAJBgNVBAgMAkxOMQswCQYDVQQH\n\
+DAJMTjEOMAwGA1UECgwFZW5kdWMxDjAMBgNVBAsMBWVuZHVjMQ4wDAYDVQQDDAVl\n\
+bmR1YzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMoxEZxJY3x8s5zv\n\
+b/txDwKt3HT9YrvI5mMzOhjl7IZJCBX7bSZzPD4kKAuV7bjuumxG/s2T+DvNcYpX\n\
+rAJ8oMfRBaRs6Z1Xc/zcYBK59Tw1hihERt2kRDTv0/BQtsSqUh1pa7wG/Eqf6VPt\n\
+epSY1EmQp8XT9D7fHcmMavie/CjAPL8zWKcuXRF3EznYggzFH7YHr+SFRUGkVkjQ\n\
+du50TAkafYuNLXDlk9y5rHwu5Q0a3zxzDDYCyTNNyK1zkK8KQYdu4ysVNM6XSfmj\n\
+Sca6xzGh7O27qG0p6AyDnYgS/xnbGLfG22JBDkyaz//8526lR7F6qXz0X7x63Qbs\n\
+HvmpPtkCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAnhjYbkfmxJRLWYwZMeLjVGdt\n\
++uUecPuo4pDzX3dmFBhm4QBZgRjYEvhLxJ2fdvSwqfaWORiSoKiB/1MlQrsyfXzw\n\
+3FS0QIu2a3ql2r9xRfrL6FWM2qqlU9D8Taw820A88BHGcqcooBCTRFJQD1hkwaln\n\
+T9Bso6CErRhSgVlpItYiKTY6+HQbqS3cDKA8+bqBPSPBGnsAUX0ahC2ct0/Zdh6X\n\
+TV6+hQD+wL8WnQB9OJWeNnX8NxBOXpv8e4zhDcvKwRf4lWR0+oWzeHnGkEoF+IwA\n\
+yjXpKqDurfzNDsZoVgQ3/92m+0ApOabAIYoU+EVhVsMC8pSmvhmPWrNqGFuJjg==\n\
+-----END CERTIFICATE-----\n";
+
+	cert_len = strlen(proxyCert);
+	
+	BIO* certBio = BIO_new(BIO_s_mem());
+	BIO_write(certBio, proxyCert, cert_len);
+	CA_cert = PEM_read_bio_X509(certBio, NULL, 0, NULL);
+	printf("%s\n", ERR_error_string(ERR_get_error(), NULL));
+	BIO_free(certBio);
+	/* SHOW name */
+	name = X509_get_subject_name(CA_cert);
+	printf("%s\n", ERR_error_string(ERR_get_error(), NULL));
+	for (int i = 0; i < X509_NAME_entry_count(name); i++) {
+		X509_NAME_ENTRY *e = X509_NAME_get_entry(name, i);
+		ASN1_STRING *d = X509_NAME_ENTRY_get_data(e);
+		char *str = ASN1_STRING_data(d);
+		printf("%s\n", str);
+	}
+	
+	
+	
+	
+	
+	
+
+#if 0
+HRESULT ModifyUserPolicyForPreventAccessToCmdPrompt(  int iMode, DWORD lData)
+{
+	const IID my_IID_IGroupPolicyObject = 
+	 { 0xea502723, 0xa23d, 0x11d1, {0xa7, 0xd3, 0x0, 0x0, 0xf8, 0x75, 0x71, 0xe3} };
+	const IID my_CLSID_GroupPolicyObject = 
+	 { 0xea502722, 0xa23d, 0x11d1, {0xa7, 0xd3, 0x0, 0x0, 0xf8, 0x75, 0x71, 0xe3} };
+
+    HRESULT hr=S_OK;
+    //
+    // Use IGroupPolicyObject to retrieve and modify the registry settings.
+    // for the GPO represented by the gpoInfo.lpDsPath
+    //
+    IGroupPolicyObject* p = NULL;
+	printf("rStatus a\n");
+	CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+    hr = CoCreateInstance(&CLSID_GroupPolicyObject, NULL,
+                          CLSCTX_INPROC_SERVER, &IID_IGroupPolicyObject,
+                          (LPVOID*)&p);
+	printf("rStatus b, %x\n", hr);
+    if (SUCCEEDED(hr))
+    {
+        //
+        // The GPO value we want to modify is the
+        //
+        // User Configuration
+        //   +> Policies
+        //        +>Administrative Templates
+        //            +->System
+        //                 +->Prevent access to the command prompt
+        //
+        DWORD dwSection = GPO_SECTION_USER;
+        HKEY hGPOSectionKey = NULL;
+        DWORD dwData;
+        HKEY hSettingKey;
+        LSTATUS rStatus;
+        hr = 0;
+        //
+        //Open the GPO and load its registy values for both: Machine and user
+        //
+        // hr = p->OpenDSGPO( bGPOPath, GPO_OPEN_LOAD_REGISTRY);
+        hr = p->lpVtbl->OpenLocalMachineGPO(p, GPO_OPEN_LOAD_REGISTRY);
+		printf("rStatus uu, %x, %p\n", hr );
+        //
+        // Request the user Registy hive for the GPO
+        //
+        printf("rStatus bb\n");
+        hr = p->lpVtbl->GetRegistryKey(p, GPO_SECTION_MACHINE, &hGPOSectionKey);
+		printf("rStatus c, %x, %p\n", hr, hGPOSectionKey );
+        //
+        // Determine if you want to set it to Not Congigure,
+        //  Enabled or Disabled for the GPO itself.
+        //
+        // The second call, RequestSetting will provide the "Yes" or "No"
+        // value for setting
+        // the policy as shown by the GPO Editor
+        //
+        // iMode
+        // 0=Not Configured, 1=Enabled, 2=Disabled
+        //
+        switch (iMode)
+        {
+        case 0:
+            //
+            // We do not want to configure the GPO, but we don't want to
+            // affect other GPOs on the same key,
+            // so just delete values associated with this
+            // particular GPO setting.
+            //
+            rStatus = RegDeleteValue(hGPOSectionKey,
+                L"Software\\Policies\\Microsoft\\Windows\\System\\DisableCMD"
+                                     );
+            rStatus = RegDeleteValue(hGPOSectionKey,
+          L"Software\\Policies\\Microsoft\\Windows\\System\\**del.DisableCMD"
+                                     );
+            break;
+        case 1:
+            {
+                //
+                // To enable the policy, the DisableCMD value must
+                // exist and the **del.DisableCMD value must not.
+                //
+                // lData:
+                //
+                // Check to see if the key for this policy exists. 
+                // If if it does, retrieve a handle
+                // If not, create it.
+                //
+                printf("rStatus e\n");
+                if( RegOpenKeyEx( hGPOSectionKey,
+                        L"Software\\Policies\\Microsoft\\Internet Explorer\\Control Panel", 0,
+                        KEY_WRITE, &hSettingKey) != ERROR_SUCCESS )
+                {
+                    rStatus = RegCreateKeyEx(
+                        hGPOSectionKey,
+                        L"Software\\Policies\\Microsoft\\Internet Explorer\\Control Panel",
+                        0,
+                        NULL,
+                        REG_OPTION_NON_VOLATILE,
+                        KEY_WRITE,
+                        NULL,
+                        &hSettingKey,
+                        NULL );
+					printf("rStatus %d\n", rStatus);
+                }
+                //
+                // Set the value DisableCMD and allow, disallow
+                // script launching of CMD 
+                //
+                rStatus = RegSetValueEx(hSettingKey, L"DisableCMD",
+                                        NULL, REG_DWORD, (BYTE *)(&lData),
+                                        sizeof(DWORD));
+
+				printf("rStatus aaa %d\n", rStatus);
+                //
+                // Remove the not configured value indicator from the hive.
+                // It may not exist, so the RegDeleteValue may return
+                // and error, this can be ignored.
+                //
+                rStatus = RegDeleteValue(hGPOSectionKey,
+          L"Software\\Policies\\Microsoft\\Windows\\System\\**del.DisableCMD"
+                                         );
+                rStatus = RegCloseKey(hSettingKey);
+				printf("rStatus 2\n");
+                break;
+            }
+        case 2:
+            {
+                //
+                // Disable the policy.
+                // must remove the DisableCMD value and add the
+                //  **del.DisableCMD value.
+                //
+                // Same stesp as before, check to see if the key for this
+                // policy exists,
+                // if not, create it.
+                //
+                BOOL bCreate = FALSE;
+                if( RegOpenKeyEx( hGPOSectionKey, L"Software\\Policies\\Microsoft\\Windows\\System", 0, KEY_WRITE, &hSettingKey) != ERROR_SUCCESS )
+                {
+                    rStatus = RegCreateKeyEx(
+                        hGPOSectionKey,
+                        L"Software\\Policies\\Microsoft\\Windows\\System",
+                        0,
+                        NULL,
+                        REG_OPTION_NON_VOLATILE,
+                        KEY_WRITE,
+                        NULL,
+                        &hSettingKey,
+                        NULL );
+                    bCreate = TRUE;
+                }
+                DWORD dwType = 0;
+                DWORD cbType = sizeof( dwData );
+                if( !bCreate )
+                {
+                    //
+                    // If we did not create the key, then our value
+                    //  *may* exist.
+                    // try to read it.  If we succeed, write that value back
+                    //  to **del.DisableCMD
+                    // if not, then set **del.DisableCMD to 0
+                    //
+                    rStatus = RegGetValue(hGPOSectionKey,
+                                          L"Software\\Policies\\Microsoft\\Windows\\System", L"DisableCMD", RRF_RT_ANY, &dwType, (BYTE *)(&dwData), &cbType);
+                    if( rStatus != ERROR_SUCCESS ) dwData = 0;
+                    else RegDeleteValue( hSettingKey, L"DisableCMD");
+                    rStatus = RegSetValueEx(hSettingKey, L"**del.DisableCMD", NULL, REG_DWORD, (BYTE *)(&dwData), sizeof(DWORD));
+                }
+                else
+                {
+                    //
+                    // The key was created, just set the **del.DisableCMD
+                    // value to 0
+                    //
+                    dwData = 0;
+                    rStatus = RegSetValueEx(hSettingKey, L"**del.DisableCMD", NULL, REG_DWORD, (BYTE *)(&dwData), sizeof(DWORD));
+                }
+                rStatus = RegCloseKey(hSettingKey);
+            }
+        }
+ 
+        GUID RegistryId = REGISTRY_EXTENSION_GUID;
+        GUID ThisAdminToolGuid =
+            /*{ CLSID_PolicySnapinUser/* */
+        {
+            0x0F6B957E,
+            0x509E,
+            0x11D1,
+            {0xA7, 0xCC, 0x00, 0x00, 0xF8, 0x75, 0x71, 0xE3}
+        };
+        rStatus = RegCloseKey(hGPOSectionKey);
+        //
+        // Write the GPO back to the directory
+        //
+        hr = p->lpVtbl->Save(p,
+            FALSE,
+            TRUE,
+            &RegistryId,
+            &ThisAdminToolGuid );
+ 
+        hr = p->lpVtbl->Release(p);
+
+		printf("Release\n", hr);
+    }
+    return hr;
+}
+#endif
+
+
+void AdjustPrivilege(void)
+{
+	printf("enter AdjustPrivilege\n");
+	
+	HANDLE hToken;
+	if (OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &hToken))
+	{
+		TOKEN_PRIVILEGES tp;
+		tp.PrivilegeCount = 1;
+		tp.Privileges[0].Attributes = SE_PRIVILEGE_USED_FOR_ACCESS;
+		if (LookupPrivilegeValue(NULL, SE_DEBUG_NAME, &tp.Privileges[0].Luid))
+		{
+			AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(tp), NULL, NULL);
+		}
+		else
+			printf("LookupPrivilegeValue fail. %d\n", errno);
+		CloseHandle(hToken);
+	}
+	else
+		printf("OpenProcessToken fail. %d\n", errno);
+}
+
+//ntdll.dll
+const unsigned long SE_DEBUG_PRIVILEGE = 0x14;
+typedef int (__stdcall *fRtlAdjustPrivilege)(ULONG, BOOLEAN, BOOLEAN, PBOOLEAN);
+
+void NtAdjustPrivilege()
+{
+	HMODULE hNtDll = LoadLibrary(("ntdll.dll"));
+	if (!hNtDll)
+		return;
+	fRtlAdjustPrivilege funcAdjustPrivilege =
+		(fRtlAdjustPrivilege)GetProcAddress(hNtDll, "RtlAdjustPrivilege");
+	if (funcAdjustPrivilege)
+	{
+		BOOLEAN oldStatus;
+		funcAdjustPrivilege(SE_DEBUG_PRIVILEGE, TRUE, FALSE, &oldStatus);
+	}
+	FreeLibrary(hNtDll);
+}
